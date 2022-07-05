@@ -1,0 +1,232 @@
+{
+ "actions": [],
+ "autoname": "naming_series:",
+ "creation": "2021-06-27 13:14:03.283115",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "naming_series",
+  "practitioner",
+  "employee",
+  "patient",
+  "dossier_id",
+  "column_break_5",
+  "company",
+  "posting_date",
+  "posting_time",
+  "sales_invoice",
+  "section_break_9",
+  "items",
+  "section_break_15",
+  "total_amount",
+  "grand_total",
+  "outstanding_amount",
+  "column_break_17",
+  "sales_invoice_remark",
+  "account_section",
+  "practitioner_account",
+  "status",
+  "column_break_13",
+  "expense_account",
+  "cost_center",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status"
+  },
+  {
+   "fieldname": "practitioner",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Practitioner",
+   "options": "Healthcare Practitioner",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "sales_invoice.patient",
+   "fieldname": "patient",
+   "fieldtype": "Link",
+   "label": "Patient",
+   "options": "Patient",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "posting_time",
+   "fieldtype": "Time",
+   "label": "Posting Time"
+  },
+  {
+   "fieldname": "sales_invoice",
+   "fieldtype": "Link",
+   "label": "Sales Invoice",
+   "options": "Sales Invoice"
+  },
+  {
+   "fieldname": "section_break_9",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "Items",
+   "options": "Practitioner Invoice Item"
+  },
+  {
+   "fieldname": "account_section",
+   "fieldtype": "Section Break",
+   "label": "Accounts"
+  },
+  {
+   "fetch_from": "company.practitioner_account",
+   "fetch_if_empty": 1,
+   "fieldname": "practitioner_account",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Practitioner Account",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_13",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "company.expence_account",
+   "fieldname": "expense_account",
+   "fieldtype": "Link",
+   "label": "Expense Account",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Practitioner Invoice",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Practitioner Invoice",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "total_amount",
+   "fieldtype": "Currency",
+   "label": "Total Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "grand_total",
+   "fieldtype": "Currency",
+   "label": "Grand Total",
+   "read_only": 1
+  },
+  {
+   "fieldname": "outstanding_amount",
+   "fieldtype": "Currency",
+   "label": "Outstanding Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Posting Date",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "practitioner.employee",
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Employee",
+   "options": "Employee",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "company.cost_center",
+   "fieldname": "cost_center",
+   "fieldtype": "Link",
+   "label": "Cost Center",
+   "options": "Cost Center",
+   "reqd": 1
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Series",
+   "options": "HLC-PINV-.YYYY.-"
+  },
+  {
+   "fetch_from": "sales_invoice.patient_encounter",
+   "fieldname": "dossier_id",
+   "fieldtype": "Link",
+   "label": "Dossier ID",
+   "options": "Patient Encounter"
+  },
+  {
+   "fieldname": "column_break_17",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "sales_invoice.remarks",
+   "fieldname": "sales_invoice_remark",
+   "fieldtype": "Small Text",
+   "label": "Sales Invoice Remark"
+  },
+  {
+   "fieldname": "section_break_15",
+   "fieldtype": "Section Break"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2021-12-14 15:25:25.610251",
+ "modified_by": "Administrator",
+ "module": "Healthcare",
+ "name": "Practitioner Invoice",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "show_name_in_global_search": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

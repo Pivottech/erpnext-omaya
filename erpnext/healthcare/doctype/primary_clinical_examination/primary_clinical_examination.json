@@ -1,0 +1,70 @@
+{
+ "actions": [],
+ "autoname": "format:{examination_name}-{examination_group}",
+ "creation": "2022-04-05 12:54:28.256835",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "examination_name",
+  "examination_group",
+  "examination_type",
+  "options"
+ ],
+ "fields": [
+  {
+   "fieldname": "examination_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Examination Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "examination_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Examination Type",
+   "options": "\nRadio\nData\nSelect",
+   "reqd": 1,
+   "set_only_once": 1
+  },
+  {
+   "depends_on": "eval:doc.examination_type == \"Select\"",
+   "fieldname": "options",
+   "fieldtype": "Small Text",
+   "label": "Options",
+   "mandatory_depends_on": "eval:doc.examination_type == \"Select\""
+  },
+  {
+   "fieldname": "examination_group",
+   "fieldtype": "Link",
+   "label": "Examination Group",
+   "options": "Primary Clinical Examination Group",
+   "reqd": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2022-06-07 16:29:46.616522",
+ "modified_by": "Administrator",
+ "module": "Healthcare",
+ "name": "Primary Clinical Examination",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

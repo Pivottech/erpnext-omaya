@@ -1,0 +1,44 @@
+<h1 class="text-center"> {%= (" كشف حساب الدكتور ") %} {%= __(filters.party) %}</h1>
+
+<h3 class="text-center">
+	{%= frappe.datetime.str_to_user(filters.from_date) %}
+	{%= __("to") %}
+	{%= frappe.datetime.str_to_user(filters.to_date) %}
+</h3>
+<hr>
+<table class="table table-bordered" style = "border: 2px solid black">
+	<thead style="font-size: 14px;border: 2px solid black" >
+		<tr>
+			<th style="width: 10%; border: 2px solid black ">{%= __("Date") %}</th>		
+			<th style="width: 15%; border: 2px solid black">{%= __("Invoices") %}</th>
+			<th style="width: 15%; border: 2px solid black">{%= __("Payments") %}</th>
+			<th style="width: 17%; border: 2px solid black">{%= __("Patient") %}</th>	
+		</tr>
+	</thead>
+	<tbody style="font-size: 14px; border: 2px solid black">
+		{% for(var i=0, l=data.length; i<l; i++) { %}
+			<tr>
+			{% if(data[i].posting_date) { %}
+				<td style="border: 2px solid black">{%= frappe.datetime.str_to_user(data[i].posting_date) %}</td>
+					<td style="text-align: right; border: 2px solid black">
+						{%= format_currency(data[i].debit, filters.presentation_currency) %}</td>
+					<td style="text-align: right; border: 2px solid black">
+						{%= format_currency(data[i].credit, filters.presentation_currency) %}</td>
+					<td style="border: 2px solid black"> {%= data[i].patient %}
+						<br>{%= data[i].dossier_id%}</td>
+			{% } else { %}
+
+				<td style= "border: 2px solid black"><b>{%= frappe.format(data[i].account, {fieldtype: "Link"}) || "&nbsp;" %}</b></td>
+				<td style="text-align: right; border: 2px solid black">
+					{%= data[i].account && format_currency(data[i].debit, filters.presentation_currency) %}
+				</td>
+				<td style="text-align: right; border: 2px solid black">
+					{%= data[i].account && format_currency(data[i].credit, filters.presentation_currency) %}
+				</td>
+			{% } %}
+			</tr>
+		{% } %}
+	</tbody>
+</table>
+<h3 class="text-center"> {%= __("Balance in") %} {%= format_currency(data[data.length-1].balance, filters.presentation_currency) %}</h3>
+<p class="text-right text-muted">Printed On {%= frappe.datetime.str_to_user(frappe.datetime.get_datetime_as_string()) %}</p>

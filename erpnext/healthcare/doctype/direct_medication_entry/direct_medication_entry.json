@@ -1,0 +1,179 @@
+{
+ "actions": [],
+ "autoname": "naming_series:",
+ "creation": "2021-11-27 15:38:37.979818",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "naming_series",
+  "company",
+  "patient",
+  "inpatient_record",
+  "entry_template",
+  "column_break_3",
+  "status",
+  "posting_date",
+  "practitioner",
+  "service_unit",
+  "invoiced",
+  "select_medication_orders_section",
+  "scan_barcode",
+  "items",
+  "section_break_18",
+  "update_stock",
+  "warehouse",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Naming Series",
+   "options": "HLC-DME-.YYYY.-"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "patient",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "Patient",
+   "options": "Patient",
+   "reqd": 1
+  },
+  {
+   "fieldname": "inpatient_record",
+   "fieldtype": "Link",
+   "label": "Related Inpatient Record",
+   "options": "Inpatient Record"
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "\nDraft\nSubmitted\nPending\nIn Process\nCompleted\nCancelled",
+   "read_only": 1
+  },
+  {
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Posting Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "practitioner",
+   "fieldtype": "Link",
+   "label": "Healthcare Practitioner",
+   "options": "Healthcare Practitioner"
+  },
+  {
+   "fieldname": "service_unit",
+   "fieldtype": "Link",
+   "label": "Healthcare Service Unit",
+   "options": "Healthcare Service Unit"
+  },
+  {
+   "fieldname": "select_medication_orders_section",
+   "fieldtype": "Section Break",
+   "label": "Medication Entry"
+  },
+  {
+   "fieldname": "section_break_18",
+   "fieldtype": "Section Break",
+   "label": "Stock Details"
+  },
+  {
+   "default": "1",
+   "fieldname": "update_stock",
+   "fieldtype": "Check",
+   "label": "Update Stock"
+  },
+  {
+   "depends_on": "update_stock",
+   "description": "Warehouse from where medication stock should be consumed",
+   "fieldname": "warehouse",
+   "fieldtype": "Link",
+   "label": "Medication Warehouse",
+   "mandatory_depends_on": "update_stock",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Direct Medication Entry",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "invoiced",
+   "fieldtype": "Check",
+   "label": "Invoiced",
+   "read_only": 1
+  },
+  {
+   "fieldname": "scan_barcode",
+   "fieldtype": "Data",
+   "label": "Scan Barcode"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "Items",
+   "options": "Direct Medication Entry Detail",
+   "reqd": 1
+  },
+  {
+   "fieldname": "entry_template",
+   "fieldtype": "Link",
+   "label": "Entry Template",
+   "options": "Direct Medication Entry Template"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [
+  {
+   "link_doctype": "Stock Entry",
+   "link_fieldname": "direct_medication_entry"
+  }
+ ],
+ "modified": "2022-03-02 12:28:59.896360",
+ "modified_by": "Administrator",
+ "module": "Healthcare",
+ "name": "Direct Medication Entry",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "restrict_to_domain": "Healthcare",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "title_field": "patient",
+ "track_changes": 1
+}

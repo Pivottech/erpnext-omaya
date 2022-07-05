@@ -1,0 +1,66 @@
+{
+ "actions": [],
+ "creation": "2021-07-26 17:54:00.647851",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "account",
+  "account_currency",
+  "amount",
+  "remark",
+  "cost_center"
+ ],
+ "fields": [
+  {
+   "fieldname": "account",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Account",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "account.account_currency",
+   "fieldname": "account_currency",
+   "fieldtype": "Link",
+   "label": "Account Currency",
+   "options": "Currency",
+   "read_only": 1
+  },
+  {
+   "fieldname": "amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Amount",
+   "non_negative": 1,
+   "options": "account_currency",
+   "reqd": 1
+  },
+  {
+   "fieldname": "remark",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Remark",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "company.cost_center",
+   "fieldname": "cost_center",
+   "fieldtype": "Link",
+   "label": "Cost Center",
+   "options": "Cost Center"
+  }
+ ],
+ "istable": 1,
+ "links": [],
+ "modified": "2021-07-26 17:54:00.647851",
+ "modified_by": "Administrator",
+ "module": "Accounts",
+ "name": "Expense Entry Account",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
