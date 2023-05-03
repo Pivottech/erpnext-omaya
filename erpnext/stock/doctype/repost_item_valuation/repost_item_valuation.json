@@ -19,6 +19,7 @@
   "allow_negative_stock",
   "via_landed_cost_voucher",
   "allow_zero_rate",
+  "escaped",
   "amended_from",
   "error_section",
   "error_log"
@@ -54,6 +55,7 @@
    "label": "Posting Time"
   },
   {
+   "allow_on_submit": 1,
    "default": "Queued",
    "fieldname": "status",
    "fieldtype": "Select",
@@ -61,8 +63,7 @@
    "in_standard_filter": 1,
    "label": "Status",
    "no_copy": 1,
-   "options": "Queued\nIn Progress\nCompleted\nFailed",
-   "read_only": 1
+   "options": "Queued\nIn Progress\nCompleted\nFailed"
   },
   {
    "fieldname": "amended_from",
@@ -87,8 +88,7 @@
    "fieldname": "error_log",
    "fieldtype": "Long Text",
    "label": "Error Log",
-   "no_copy": 1,
-   "read_only": 1
+   "no_copy": 1
   },
   {
    "fetch_from": "warehouse.company",
@@ -126,6 +126,7 @@
    "reqd": 1
   },
   {
+   "allow_on_submit": 1,
    "default": "0",
    "fieldname": "allow_negative_stock",
    "fieldtype": "Check",
@@ -142,12 +143,19 @@
    "fieldname": "allow_zero_rate",
    "fieldtype": "Check",
    "label": "Allow Zero Rate"
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "0",
+   "fieldname": "escaped",
+   "fieldtype": "Check",
+   "label": "Escaped"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2020-12-10 07:52:12.476589",
+ "modified": "2023-04-26 14:08:46.833515",
  "modified_by": "Administrator",
  "module": "Stock",
  "name": "Repost Item Valuation",

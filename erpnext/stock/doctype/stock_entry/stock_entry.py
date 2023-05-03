@@ -92,7 +92,12 @@ class StockEntry(StockController):
 		self.validate_putaway_capacity()
 
 	def on_submit(self):
-		self.update_stock_ledger()
+		try:
+			self.update_stock_ledger()
+		except:
+			self.queue_action("submit")
+			frappe.throw("Added To Background Job")
+			return
 
 		update_serial_nos_after_submit(self, "items")
 		self.update_work_order()
@@ -124,7 +129,7 @@ class StockEntry(StockController):
 		self.update_work_order()
 		self.update_stock_ledger()
 
-		self.ignore_linked_doctypes = ('GL Entry', 'Stock Ledger Entry', 'Repost Item Valuation')
+		self.ignore_linked_doctypes = ('GL Entry', 'Stock Ledger Entry', 'Repost Item Valuation', 'Direct Medication Entry')
 
 		self.make_gl_entries_on_cancel()
 		self.repost_future_sle_and_gle()

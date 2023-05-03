@@ -48,7 +48,8 @@
   "laboratory_sms_alerts",
   "sms_printed",
   "column_break_28",
-  "sms_emailed"
+  "sms_emailed",
+  "discharge_all"
  ],
  "fields": [
   {
@@ -322,11 +323,17 @@
    "fieldname": "do_not_bill_inpatient_encounters",
    "fieldtype": "Check",
    "label": "Do Not Bill Patient Encounters for Inpatients"
+  },
+  {
+   "fieldname": "discharge_all",
+   "fieldtype": "Button",
+   "label": "Discharge All",
+   "options": "invoice_all"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2021-01-13 09:04:35.877700",
+ "modified": "2022-07-30 14:58:16.425237",
  "modified_by": "Administrator",
  "module": "Healthcare",
  "name": "Healthcare Settings",

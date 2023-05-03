@@ -64,6 +64,7 @@ def repost(doc):
 
 	except (Exception, JobTimeoutException):
 		frappe.db.rollback()
+		doc.set_status('Failed')
 		traceback = frappe.get_traceback()
 		frappe.log_error(traceback)
 
@@ -73,7 +74,6 @@ def repost(doc):
 		frappe.db.set_value(doc.doctype, doc.name, 'error_log', message)
 
 		notify_error_to_stock_managers(doc, message)
-		doc.set_status('Failed')
 		raise
 	finally:
 		frappe.db.commit()

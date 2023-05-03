@@ -87,7 +87,12 @@ def get_cash_flow_accounts():
 			{"account_type": "Depreciation", "label": _("Depreciation")},
 			{"account_type": "Receivable", "label": _("Net Change in Accounts Receivable")},
 			{"account_type": "Payable", "label": _("Net Change in Accounts Payable")},
-			{"account_type": "Stock", "label": _("Net Change in Inventory")}
+			{"account_type": "Stock", "label": _("Net Change in Inventory")},
+			{"account_type": "Stock Received But Not Billed", "label": _("Stock Received But Not Billed")},
+			{"account_type": "Other Debit", "label": _("Other Debit")},
+			{"account_type": "Other Credit", "label": _("Other Credit")},
+			{"account_type": "Temporary", "label": _("Temporary")}
+			
 		]
 	}
 

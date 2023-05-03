@@ -532,6 +532,11 @@ def get_columns(filters):
 			"fieldname": "balance",
 			"fieldtype": "Float",
 			"width": 130
+		},
+		{
+			"label": _("Remarks"),
+			"fieldname": "remarks",
+			"width": 400
 		}
 	]
 
@@ -566,6 +571,8 @@ def get_columns(filters):
 		{
 			"label": _("Dossier"),
 			"fieldname": "dossier_id",
+			"fieldtype": "Link",
+			"options": "Patient Encounter",
 			"width": 100
 		},
 		{
@@ -609,11 +616,6 @@ def get_columns(filters):
 			"fieldname": "bill_no",
 			"fieldtype": "Data",
 			"width": 100
-		},
-		{
-			"label": _("Remarks"),
-			"fieldname": "remarks",
-			"width": 400
 		}
 	])
 

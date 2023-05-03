@@ -61,10 +61,22 @@ frappe.query_reports["Item-wise Sales Register"] = {
 			"options": "Item Group"
 		},
 		{
+			"fieldname": "item_category_for_sales_invoice",
+			"label": __("Item Category"),
+			"fieldtype": "Link",
+			"options": "Item Category"
+		},
+		{
 			"label": __("Group By"),
 			"fieldname": "group_by",
 			"fieldtype": "Select",
 			"options": ["Customer Group", "Customer", "Item Group", "Item", "Territory", "Invoice"]
+		},
+		{
+			"label": __("Patient Encounter Type"),
+			"fieldname": "patient_encounter_type",
+			"fieldtype": "Select",
+			"options": ["","Hospital", "Custom", "Heart", "Catheter"]
 		}
 	],
 	"formatter": function(value, row, column, data, default_formatter) {

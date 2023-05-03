@@ -82,6 +82,7 @@
    "read_only": 1
   },
   {
+   "fetch_from": "item.item_code",
    "fieldname": "item_code",
    "fieldtype": "Data",
    "label": "Item Code",
@@ -138,7 +139,7 @@
   }
  ],
  "links": [],
- "modified": "2020-05-20 15:31:09.627516",
+ "modified": "2023-02-18 13:10:39.034726",
  "modified_by": "Administrator",
  "module": "Healthcare",
  "name": "Healthcare Service Unit Type",
@@ -160,5 +161,6 @@
  "restrict_to_domain": "Healthcare",
  "sort_field": "modified",
  "sort_order": "DESC",
- "title_field": "service_unit_type"
+ "title_field": "service_unit_type",
+ "track_changes": 1
 }

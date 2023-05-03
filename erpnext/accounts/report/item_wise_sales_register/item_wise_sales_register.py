@@ -2,6 +2,7 @@
 # License: GNU General Public License v3. See license.txt
 
 from __future__ import unicode_literals
+from distutils.log import debug
 import frappe, erpnext
 from frappe import _
 from frappe.utils import flt, cstr
@@ -12,7 +13,11 @@ from erpnext.selling.report.item_wise_sales_history.item_wise_sales_history impo
 from erpnext.setup.doctype.item_group.item_group import get_child_item_groups
 
 def execute(filters=None):
-	return _execute(filters)
+	return _execute(filters,additional_table_columns=[{
+		"fieldname": "row_remark",
+		"fieldtype": "Data",
+		"label": "Row Remark",
+	}], additional_query_columns=["row_remark"])
 
 def _execute(filters=None, additional_table_columns=None, additional_query_columns=None):
 	if not filters: filters = {}
@@ -55,12 +60,14 @@ def _execute(filters=None, additional_table_columns=None, additional_query_colum
 			'item_code': d.item_code,
 			'item_name': item_record.item_name if item_record else d.item_name,
 			'item_group': item_record.item_group if item_record else d.item_group,
+			'item_category_for_sales_invoice': d.item_category_for_sales_invoice,
 			'description': d.description,
 			'invoice': d.parent,
 			'posting_date': d.posting_date,
 			'customer': d.customer,
 			'customer_name': customer_record.customer_name,
 			'customer_group': customer_record.customer_group,
+			'practitioner': d.practitioner
 		}
 
 		if additional_query_columns:
@@ -126,7 +133,6 @@ def _execute(filters=None, additional_table_columns=None, additional_query_colum
 		add_sub_total_row(total_row, total_row_map, 'total_row', tax_columns)
 		data.append(total_row_map.get('total_row'))
 		skip_total_row = 1
-
 	return columns, data, None, None, None, skip_total_row
 
 def get_columns(additional_table_columns, filters):
@@ -146,6 +152,12 @@ def get_columns(additional_table_columns, filters):
 					'label': _('Item Name'),
 					'fieldname': 'item_name',
 					'fieldtype': 'Data',
+					'width': 120
+				},
+				{
+					'label': _("Item Category For SI"),
+					'fieldname': "item_category_for_sales_invoice", 
+					'fieldtype': "Data",
 					'width': 120
 				}
 			]
@@ -180,6 +192,13 @@ def get_columns(additional_table_columns, filters):
 			'label': _('Posting Date'),
 			'fieldname': 'posting_date',
 			'fieldtype': 'Date',
+			'width': 120
+		},
+		{
+			'label': _('Practitioner'),
+			'fieldname': 'practitioner',
+			'fieldtpe': 'Link',
+			'options': 'Healthcare Practitioner',
 			'width': 120
 		}
 	])
@@ -332,7 +351,9 @@ def get_conditions(filters):
 		("customer", " and `tabSales Invoice`.customer = %(customer)s"),
 		("item_code", " and `tabSales Invoice Item`.item_code = %(item_code)s"),
 		("from_date", " and `tabSales Invoice`.posting_date>=%(from_date)s"),
-		("to_date", " and `tabSales Invoice`.posting_date<=%(to_date)s")):
+		("to_date", " and `tabSales Invoice`.posting_date<=%(to_date)s"),
+		("item_category_for_sales_invoice", " and `tabItem`.item_category_for_sales_invoice = %(item_category_for_sales_invoice)s"),
+		("patient_encounter_type", "and `tabSales Invoice`.patient_encounter_type = %(patient_encounter_type)s")):
 			if filters.get(opts[0]):
 				conditions += opts[1]
 
@@ -392,12 +413,17 @@ def get_items(filters, additional_query_columns):
 			`tabSales Invoice Item`.income_account, `tabSales Invoice Item`.cost_center,
 			`tabSales Invoice Item`.stock_qty, `tabSales Invoice Item`.stock_uom,
 			`tabSales Invoice Item`.base_net_rate, `tabSales Invoice Item`.base_net_amount,
+			`tabSales Invoice Item`.practitioner,
 			`tabSales Invoice`.customer_name, `tabSales Invoice`.customer_group, `tabSales Invoice Item`.so_detail,
-			`tabSales Invoice`.update_stock, `tabSales Invoice Item`.uom, `tabSales Invoice Item`.qty {0}
-		from `tabSales Invoice`, `tabSales Invoice Item`
+			`tabSales Invoice`.update_stock, `tabSales Invoice Item`.uom, `tabSales Invoice Item`.qty,
+			`tabItem`.item_category_for_sales_invoice {0}
+			
+		from `tabSales Invoice`, `tabSales Invoice Item`, `tabItem`
 		where `tabSales Invoice`.name = `tabSales Invoice Item`.parent
-			and `tabSales Invoice`.docstatus = 1 {1}
+			and `tabSales Invoice`.docstatus = 1
+			and `tabItem`.name = `tabSales Invoice Item`.item_code {1}
 		""".format(additional_query_columns or '', conditions), filters, as_dict=1) #nosec
+
 
 def get_delivery_notes_against_sales_order(item_list):
 	so_dn_map = frappe._dict()

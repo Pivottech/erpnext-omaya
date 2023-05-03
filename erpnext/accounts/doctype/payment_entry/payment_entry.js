@@ -205,6 +205,8 @@ frappe.ui.form.on('Payment Entry', {
 
 		frm.toggle_display("received_amount", (frm.doc.payment_type=="Internal Transfer" ||
 			frm.doc.paid_from_account_currency != frm.doc.paid_to_account_currency))
+		frm.toggle_display("received_amount_in_words", (frm.doc.payment_type=="Internal Transfer" ||
+			frm.doc.paid_from_account_currency != frm.doc.paid_to_account_currency))
 
 		frm.toggle_display(["base_total_allocated_amount"],
 			(frm.doc.paid_amount && frm.doc.received_amount && frm.doc.base_total_allocated_amount &&

@@ -23,6 +23,7 @@
   "warehouse",
   "tree_details_section",
   "parent_healthcare_service_unit",
+  "whole_room",
   "lft",
   "rgt",
   "old_parent"
@@ -164,10 +165,16 @@
    "fieldname": "tree_details_section",
    "fieldtype": "Section Break",
    "label": "Tree Details"
+  },
+  {
+   "default": "0",
+   "fieldname": "whole_room",
+   "fieldtype": "Check",
+   "label": "Whole Room"
   }
  ],
  "links": [],
- "modified": "2020-05-20 18:26:56.065543",
+ "modified": "2022-07-19 14:01:26.012654",
  "modified_by": "Administrator",
  "module": "Healthcare",
  "name": "Healthcare Service Unit",

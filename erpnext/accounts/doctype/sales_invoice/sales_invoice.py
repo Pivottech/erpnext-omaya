@@ -1298,7 +1298,13 @@ class SalesInvoice(SellingController):
 	# Healthcare
 	@frappe.whitelist()
 	def set_healthcare_services(self, checked_values):
-		self.set("items", [])
+		#removing_auto_items
+		listt = []
+		if hasattr(self, "items"):
+			for item in self.items:
+				if not item.auto_item:
+					listt.append(item.as_dict())
+		self.set("items",[])
 		from erpnext.stock.get_item_details import get_item_details
 		for checked_item in checked_values:
 			item_line = self.append("items", {})
@@ -1331,6 +1337,14 @@ class SalesInvoice(SellingController):
 				item_line.reference_dn = checked_item['dn']
 			if checked_item['description']:
 				item_line.description = checked_item['description']
+			if checked_item['auto_item']:
+				item_line.auto_item = checked_item['auto_item']
+				
+		for i in listt:
+			item_line = self.append("items", {})
+			for key in i:
+				if key not in ["name", "idx"]:
+					item_line.set(key, i[key])
 
 		self.set_missing_values(for_validate = True)
 

@@ -3,23 +3,14 @@
 
 frappe.ui.form.on('Direct Medication Entry', {
 	refresh: function (frm) {
-		/*frm.set_query('item_code', 'items', function () {
-			let items = null;
-			frappe.call({
-				method: "item_code_query",
-				doc: frm.doc,
-				callback: function (res) {
-					items = res.message;
-				},
-				async: false
-			});
+		frm.set_query('item_code', 'items', function () {
 			return {
-				filters: [
-					['Item', 'name', 'in', items]
-				]
+				query: "erpnext.controllers.queries.warehouse_items_query",
+				filters: {
+					warehouse: frm.doc.warehouse
+				}
 			}
-			
-		});*/
+		});
 	},
 	scan_barcode: function(frm){
 		if (frm.doc.scan_barcode) {
@@ -28,14 +19,14 @@ frappe.ui.form.on('Direct Medication Entry', {
 		}
 	}
 });
-frappe.ui.form.on('Direct Medication Entry Detail', {
-	item_code: function(frm, cdt, cdn) {
-		var d = locals[cdt][cdn];
-		if(d.item_code) {
-			frappe.db.get_value("Item", d.item_code,"item_name").then(item_name => {
-				d.item_name = item_name.message.item_name;
-				frm.refresh_fields("items");
-			});
-		}
-	}
-});
+// frappe.ui.form.on('Direct Medication Entry Detail', {
+// 	item_code: function(frm, cdt, cdn) {
+// 		var d = locals[cdt][cdn];
+// 		if(d.item_code) {
+// 			frappe.db.get_value("Item", d.item_code,"item_name").then(item_name => {
+// 				d.item_name = item_name.message.item_name;
+// 				frm.refresh_fields("items");
+// 			});
+// 		}
+// 	}
+// });

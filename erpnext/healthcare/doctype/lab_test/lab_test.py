@@ -7,13 +7,19 @@ import frappe
 from frappe import _
 from frappe.model.document import Document
 from frappe.utils import getdate, cstr, get_link_to_form, flt
-from erpnext.healthcare.pivot_utils import create_sales_invoice_for_healthcare
+from erpnext.healthcare.doctype.healthcare_settings.healthcare_settings import get_receivable_account
+from erpnext.stock.get_item_details import get_item_details
 
 class LabTest(Document):
 	def validate(self):
 		if not self.is_new():
 			self.set_secondary_uom_result()
 		self.validate_normal_test_items()
+
+	def before_save(self):
+		if self.test_templates:
+			self.normal_test_items = []
+			self.load_test_from_template()
 	
 	def validate_normal_test_items(self):
 		items = []
@@ -25,9 +31,7 @@ class LabTest(Document):
 	def on_submit(self):
 		self.db_set('submitted_date', getdate())
 		if self.is_external_patient:
-			si = create_sales_invoice_for_healthcare(self.sales_invoice_type, self.patient, self.company)
-			frappe.get_doc("Sales Invoice", si).submit()
-			frappe.set_value("Lab Test", self.name, "sales_invoice", si)
+			self.create_sales_invoice_for_lab_test()
  
 	def on_cancel(self):
 		self.db_set('status', 'Cancelled')
@@ -45,14 +49,10 @@ class LabTest(Document):
 			frappe.db.set_value('Lab Prescription', self.prescription, 'lab_test_created', 1)
 			if frappe.db.get_value('Lab Prescription', self.prescription, 'invoiced'):
 				self.invoiced = True
-		if self.test_templates:
-			self.load_test_from_template()
-			self.reload()
 
 	def load_test_from_template(self):
 		lab_test = self
 		create_test_from_template(lab_test)
-		self.reload()
 
 	def set_secondary_uom_result(self):
 		for item in self.normal_test_items:
@@ -88,6 +88,58 @@ class LabTest(Document):
 	@frappe.whitelist()	
 	def complete_lab_test(self):
 		self.validate_result_values()
+
+	def create_sales_invoice_for_lab_test(self):
+		customer = frappe.db.get_value("Patient", self.patient, "customer")
+		items = []
+		services = get_lab_tests_to_invoice(self)
+		price_list, price_list_currency = frappe.db.get_values('Price List', {'selling': 1}, ['name', 'currency'])[0]
+		for service in services:
+			item = get_item_details({
+				'doctype': 'Sales Invoice',
+				'item_code': service.get("service"),
+				'company': self.company,
+				'customer': customer,
+				'selling_price_list': price_list,
+				'price_list_currency': price_list_currency,
+				'plc_conversion_rate': 1.0,
+				'conversion_rate': 1.0
+			})
+			item.update({
+				"doctype": "Sales Invoice Item",
+				"qty": service.get("qty") or 1,
+				"income_account": service.get("income_account"),
+				"dt": service.get("reference_type"),
+				"dn": service.get("reference_name"),
+				"practitioner": service.get("practitioner")
+			})
+			items.append(item)
+		si = frappe.new_doc("Sales Invoice")
+		si.sales_invoice_type = self.sales_invoice_type
+		si.customer = customer
+		si.patient = self.patient
+		si.company = self.company
+		si.debit_to = get_receivable_account(self.company)
+		for i in items:
+			si.append("items", i)
+		si.set_missing_values()
+		si.insert(ignore_permissions=True)
+		si.submit()
+		frappe.msgprint('Sales Invoice <a href="#Form/Journal Entry/%s" target="_blank">%s</a> Created'% (si.name, si.name))
+		self.db_set("sales_invoice",si.name)
+
+def get_lab_tests_to_invoice(lab_test):
+	lab_tests_to_invoice = []
+	test_templates = frappe.get_list("Lab Test Template Detail", filters = {"parent": lab_test.name, "invoiced": 0}, fields = ["*"])
+	for t in test_templates:
+		item, is_billable = frappe.get_cached_value('Lab Test Template', t.test_template, ['item', 'is_billable'])
+		if is_billable:
+			lab_tests_to_invoice.append({
+				'reference_type': 'Lab Test Template Detail',
+				'reference_name': t.name,
+				'service': item
+			})
+	return lab_tests_to_invoice
 
 
 
@@ -228,6 +280,7 @@ def create_compounds(template, lab_test, is_group):
 			normal.normal_range = normal_test_template.normal_range
 			normal.require_result_value = 1
 			normal.allow_blank = normal_test_template.allow_blank
+			normal.is_group = normal_test_template.is_group
 			normal.template = template.name
 
 def check_patient_conditions(lab_test, normal_test_template):
@@ -349,14 +402,8 @@ def load_result_format(lab_test, template, prescription, invoice):
 				normal.allow_blank = lab_test_group.allow_blank
 				normal.require_result_value = 1
 				normal.template = template.name
+	return lab_test
 
-	if template.lab_test_template_type != 'No Result':
-		if prescription:
-			lab_test.prescription = prescription
-			if invoice:
-				frappe.db.set_value('Lab Prescription', prescription, 'invoiced', True)
-		lab_test.save(ignore_permissions=True) # Insert the result
-		return lab_test
 
 @frappe.whitelist()
 def get_employee_by_user_id(user_id):

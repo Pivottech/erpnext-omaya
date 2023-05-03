@@ -26,10 +26,10 @@ class StockReconciliation(StockController):
 		if not self.cost_center:
 			self.cost_center = frappe.get_cached_value('Company',  self.company,  "cost_center")
 		self.validate_posting_time()
-		self.remove_items_with_no_change()
 		self.validate_data()
 		self.validate_expense_account()
 		self.validate_customer_provided_item()
+		self.remove_items_with_no_change()
 		self.set_zero_value_for_customer_provided_items()
 		self.set_total_qty_and_amount()
 		self.validate_putaway_capacity()

@@ -23,7 +23,8 @@ def get_data(report_filters):
 
 	filters = {
 		"company": report_filters.company,
-		"posting_date": ("<=", report_filters.as_on_date)
+		"posting_date": ("<=", report_filters.as_on_date),
+		"is_cancelled": 0
 	}
 
 	currency_precision = get_currency_precision() or 2

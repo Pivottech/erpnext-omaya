@@ -86,34 +86,35 @@ def get_columns():
 	columns = [
 		{"label": _("Date"), "fieldname": "date", "fieldtype": "Datetime", "width": 150},
 		{"label": _("Item"), "fieldname": "item_code", "fieldtype": "Link", "options": "Item", "width": 100},
-		{"label": _("Item Name"), "fieldname": "item_name", "width": 100},
+		{"label": _("Item Name"), "fieldname": "item_name", "width": 100, "hidden": 1},
 		{"label": _("Stock UOM"), "fieldname": "stock_uom", "fieldtype": "Link", "options": "UOM", "width": 90},
 		{"label": _("In Qty"), "fieldname": "in_qty", "fieldtype": "Float", "width": 80, "convertible": "qty"},
 		{"label": _("Out Qty"), "fieldname": "out_qty", "fieldtype": "Float", "width": 80, "convertible": "qty"},
 		{"label": _("Balance Qty"), "fieldname": "qty_after_transaction", "fieldtype": "Float", "width": 100, "convertible": "qty"},
-		{"label": _("Voucher #"), "fieldname": "voucher_no", "fieldtype": "Dynamic Link", "options": "voucher_type", "width": 150},
-		{"label": _("Warehouse"), "fieldname": "warehouse", "fieldtype": "Link", "options": "Warehouse", "width": 150},
-		{"label": _("Item Group"), "fieldname": "item_group", "fieldtype": "Link", "options": "Item Group", "width": 100},
-		{"label": _("Brand"), "fieldname": "brand", "fieldtype": "Link", "options": "Brand", "width": 100},
-		{"label": _("Description"), "fieldname": "description", "width": 200},
 		{"label": _("Incoming Rate"), "fieldname": "incoming_rate", "fieldtype": "Currency", "width": 110, "options": "Company:company:default_currency", "convertible": "rate"},
 		{"label": _("Valuation Rate"), "fieldname": "valuation_rate", "fieldtype": "Currency", "width": 110, "options": "Company:company:default_currency", "convertible": "rate"},
 		{"label": _("Stock Queue"), "fieldname": "stock_queue", "fieldtype": "Data", "width": 110},
 		{"label": _("Stock Difference"), "fieldname": "stock_value_difference", "fieldtype": "Data", "width": 110},
 		{"label": _("Balance Value"), "fieldname": "stock_value", "fieldtype": "Currency", "width": 110, "options": "Company:company:default_currency"},
+		{"label": _("Voucher #"), "fieldname": "voucher_no", "fieldtype": "Dynamic Link", "options": "voucher_type", "width": 150},
+		{"label": _("Warehouse"), "fieldname": "warehouse", "fieldtype": "Link", "options": "Warehouse", "width": 150},
+		{"label": _("Item Group"), "fieldname": "item_group", "fieldtype": "Link", "options": "Item Group", "width": 100},
+		{"label": _("Brand"), "fieldname": "brand", "fieldtype": "Link", "options": "Brand", "width": 100, "hidden": 1},
+		{"label": _("Description"), "fieldname": "description", "width": 200},
 		{"label": _("Voucher Type"), "fieldname": "voucher_type", "width": 110},
-		{"label": _("Voucher #"), "fieldname": "voucher_no", "fieldtype": "Dynamic Link", "options": "voucher_type", "width": 100},
-		{"label": _("Batch"), "fieldname": "batch_no", "fieldtype": "Link", "options": "Batch", "width": 100},
-		{"label": _("Serial No"), "fieldname": "serial_no", "fieldtype": "Link", "options": "Serial No", "width": 100},
-		{"label": _("Balance Serial No"), "fieldname": "balance_serial_no", "width": 100},
-		{"label": _("Project"), "fieldname": "project", "fieldtype": "Link", "options": "Project", "width": 100},
-		{"label": _("Company"), "fieldname": "company", "fieldtype": "Link", "options": "Company", "width": 110}
+		{"label": _("Batch"), "fieldname": "batch_no", "fieldtype": "Link", "options": "Batch", "width": 100, "hidden": 1},
+		{"label": _("Serial No"), "fieldname": "serial_no", "fieldtype": "Link", "options": "Serial No", "width": 100, "hidden": 1},
+		{"label": _("Balance Serial No"), "fieldname": "balance_serial_no", "width": 100, "hidden": 1},
+		{"label": _("Project"), "fieldname": "project", "fieldtype": "Link", "options": "Project", "width": 100, "hidden": 1},
+		{"label": _("Company"), "fieldname": "company", "fieldtype": "Link", "options": "Company", "width": 110, "hidden": 1}
 	]
 
 	return columns
 
 
 def get_stock_ledger_entries(filters, items):
+	if filters.get("sales_invoice"):
+		return get_stock_ledger_entries_for_si(filters.get("sales_invoice"))
 	item_conditions_sql = ''
 	if items:
 		item_conditions_sql = 'and sle.item_code in ({})'\
@@ -150,6 +151,45 @@ def get_stock_ledger_entries(filters, items):
 		filters, as_dict=1)
 
 	return sl_entries
+
+def get_stock_ledger_entries_for_si(sales_invoice):
+	stock_entries_names = set()
+	items = frappe.get_list("Sales Invoice Item", filters = {"parent": sales_invoice}, fields = ["item_code","reference_dt", "reference_dn"])
+	for item in items:
+		if item.reference_dt == "Direct Medication Entry Detail":
+				parent = frappe.db.get_value(item.reference_dt, item.reference_dn, "parent")
+				stock_entries_names.update(frappe.get_list("Stock Entry", filters = {"direct_medication_entry": parent, "docstatus": 1}, pluck = "name"))
+		elif item.reference_dt == "Clinical Procedure":
+				se = frappe.db.get_value(item.reference_dt, item.reference_dn, "stock_entry")
+				if se:
+					stock_entries_names.add(se)
+	sl_entries = frappe.db.sql("""
+		SELECT
+			concat_ws(" ", posting_date, posting_time) AS date,
+			item_code,
+			warehouse,
+			actual_qty,
+			qty_after_transaction,
+			incoming_rate,
+			valuation_rate,
+			stock_value,
+			voucher_type,
+			voucher_no,
+			batch_no,
+			serial_no,
+			company,
+			project,
+			stock_value_difference,
+			stock_queue
+		FROM
+			`tabStock Ledger Entry` sle
+		WHERE
+			voucher_type = "Stock Entry" and voucher_no in %(sles)s
+		ORDER BY
+			posting_date asc, posting_time asc, creation asc
+		""",{"sles": list(stock_entries_names)}, as_dict=1)
+	return sl_entries
+			
 
 
 def get_items(filters):

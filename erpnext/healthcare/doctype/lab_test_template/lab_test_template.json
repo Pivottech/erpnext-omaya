@@ -14,7 +14,6 @@
   "lab_test_code",
   "lab_test_group",
   "department",
-  "most_use",
   "column_break_3",
   "disabled",
   "lab_test_template_type",
@@ -49,7 +48,8 @@
   "result_legend_section",
   "legend_print_position",
   "result_legend",
-  "change_in_item"
+  "change_in_item",
+  "most_use"
  ],
  "fields": [
   {
@@ -320,14 +320,14 @@
    "fieldtype": "Column Break"
   },
   {
-   "description": "name will appear in inpatient record in Add Lab Tests Window",
+   "default": "0",
    "fieldname": "most_use",
-   "fieldtype": "Data",
+   "fieldtype": "Check",
    "label": "Most Use"
   }
  ],
  "links": [],
- "modified": "2022-04-19 14:23:19.744549",
+ "modified": "2022-08-22 14:31:06.698851",
  "modified_by": "Administrator",
  "module": "Healthcare",
  "name": "Lab Test Template",

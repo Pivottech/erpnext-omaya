@@ -23,6 +23,8 @@
   "section_break_18",
   "update_stock",
   "warehouse",
+  "remark",
+  "stock_entry",
   "amended_from"
  ],
  "fields": [
@@ -65,11 +67,13 @@
    "read_only": 1
   },
   {
+   "default": "Today",
    "fieldname": "posting_date",
    "fieldtype": "Date",
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Posting Date",
+   "read_only": 1,
    "reqd": 1
   },
   {
@@ -98,7 +102,8 @@
    "default": "1",
    "fieldname": "update_stock",
    "fieldtype": "Check",
-   "label": "Update Stock"
+   "label": "Update Stock",
+   "read_only": 1
   },
   {
    "depends_on": "update_stock",
@@ -119,11 +124,11 @@
    "read_only": 1
   },
   {
+   "allow_on_submit": 1,
    "default": "0",
    "fieldname": "invoiced",
    "fieldtype": "Check",
-   "label": "Invoiced",
-   "read_only": 1
+   "label": "Invoiced"
   },
   {
    "fieldname": "scan_barcode",
@@ -142,6 +147,19 @@
    "fieldtype": "Link",
    "label": "Entry Template",
    "options": "Direct Medication Entry Template"
+  },
+  {
+   "fieldname": "remark",
+   "fieldtype": "Text",
+   "label": "Remark"
+  },
+  {
+   "fieldname": "stock_entry",
+   "fieldtype": "Link",
+   "label": "Stock Entry",
+   "no_copy": 1,
+   "options": "Stock Entry",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
@@ -152,7 +170,7 @@
    "link_fieldname": "direct_medication_entry"
   }
  ],
- "modified": "2022-03-02 12:28:59.896360",
+ "modified": "2023-03-16 10:29:53.040724",
  "modified_by": "Administrator",
  "module": "Healthcare",
  "name": "Direct Medication Entry",

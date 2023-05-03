@@ -940,7 +940,9 @@ frappe.ui.form.on('Sales Invoice', {
 								callback: function(dms_res){
 									list = list.concat(dms_res.message);
 								},
-								async: false
+								async: false,
+								freeze: 1,
+								freeze_message: "Getting Items From Healthcare"
 							});
 							var items = []
 							for (var i = 0 ; i < list.length; i++){
@@ -951,7 +953,8 @@ frappe.ui.form.on('Sales Invoice', {
 								row['income_account'] = "";
 								row['dt'] = list[i]['reference_type'];
 								row['dn'] = list[i]['reference_name'];
-								row['description'] = ""
+								row['description'] = "";
+								row['auto_item'] = true;
 								items.push(row);
 							}
 							add_to_item_line(frm, items, 1);
@@ -1306,7 +1309,9 @@ var add_to_item_line = function(frm, checked_values, invoice_healthcare_services
 			callback: function() {
 				frm.trigger("validate");
 				frm.refresh_fields();
-			}
+			},
+			freeze: 1,
+			freeze_message: "Updating Items Table"
 		});
 	}
 	else{

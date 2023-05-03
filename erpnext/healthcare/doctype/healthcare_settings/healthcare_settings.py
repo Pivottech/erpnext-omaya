@@ -25,6 +25,14 @@ class HealthcareSettings(Document):
 			validate_service_item(self.op_consulting_charge_item)
 		if self.clinical_procedure_consumable_item:
 			validate_service_item(self.clinical_procedure_consumable_item)
+	
+	@frappe.whitelist()
+	def invoice_all(self):
+		dmes = frappe.get_list("Direct Medication Entry", filters={"invoiced": 1}, fields=["name", "inpatient_record"])
+		for dme in dmes:
+			query = "update `tabDirect Medication Entry Detail` set invoiced = 1 where parent = '%s'"%dme.name
+			frappe.db.sql(query)
+
 
 
 def validate_service_item(item):

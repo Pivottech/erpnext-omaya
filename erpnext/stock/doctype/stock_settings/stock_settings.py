@@ -10,6 +10,7 @@ from frappe.model.document import Document
 from frappe.utils.html_utils import clean_html
 from frappe.utils import cint
 from frappe.custom.doctype.property_setter.property_setter import make_property_setter
+from erpnext.stock.doctype.repost_item_valuation.repost_item_valuation import repost_sl_entries, repost_gl_entries
 
 class StockSettings(Document):
 	def validate(self):
@@ -71,6 +72,44 @@ class StockSettings(Document):
 		make_property_setter("Delivery Note Item", "target_warehouse", "hidden", 1 - cint(self.allow_from_dn), "Check", validate_fields_for_doctype=False)
 		make_property_setter("Purchase Invoice Item", "from_warehouse", "hidden", 1 - cint(self.allow_from_pr), "Check", validate_fields_for_doctype=False)
 		make_property_setter("Purchase Receipt Item", "from_warehouse", "hidden", 1 - cint(self.allow_from_pr), "Check", validate_fields_for_doctype=False)
+
+def repost_all_items(warehouse):
+	bins = frappe.get_list("Bin", fields=["item_code", "warehouse"], filters={"warehouse": warehouse})
+	for bin in bins:
+		print("working {0} {1} \n".format(bin.item_code, bin.warehouse))
+		doc = frappe._dict({
+			"item_code": bin.item_code,
+			"warehouse": bin.warehouse,
+			"posting_date": "2022-1-1",
+			"posting_time": "00:00:00",
+			"based_on": "Item and Warehouse",
+			"company": "Omaya Hospital"
+		})
+		try:
+			repost_sl_entries(doc)
+			repost_gl_entries(doc)
+			frappe.db.commit()
+		except:
+			print("need restart {0} {1} \n".format(bin.item_code, bin.warehouse))
+
+def repost_item(item, warehouse):
+	bins = frappe.get_list("Bin", fields=["item_code", "warehouse"], filters={"item_code": item,"warehouse": warehouse})
+	for bin in bins:
+		print("working {0} {1} \n".format(bin.item_code, bin.warehouse))
+		doc = frappe._dict({
+			"item_code": bin.item_code,
+			"warehouse": bin.warehouse,
+			"posting_date": "2021-1-1",
+			"posting_time": "00:00:00",
+			"based_on": "Item and Warehouse",
+			"company": "Omaya Hospital"
+		})
+		repost_sl_entries(doc)
+		repost_gl_entries(doc)
+		frappe.db.commit()
+
+			
+
 
 
 def clean_all_descriptions():

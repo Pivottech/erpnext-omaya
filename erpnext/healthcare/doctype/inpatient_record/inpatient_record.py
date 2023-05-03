@@ -150,6 +150,7 @@ def check_out_inpatient(inpatient_record):
 				inpatient_occupancy.left = True
 				inpatient_occupancy.check_out = now_datetime()
 				frappe.db.set_value("Healthcare Service Unit", inpatient_occupancy.service_unit, "occupancy_status", "Vacant")
+				check_for_inner_units_or_whole_unit(inpatient_occupancy.service_unit, "Vacant")
 
 
 def discharge_patient(inpatient_record):
@@ -253,6 +254,39 @@ def transfer_patient(inpatient_record, service_unit, check_in):
 	inpatient_record.save(ignore_permissions = True)
 
 	frappe.db.set_value("Healthcare Service Unit", service_unit, "occupancy_status", "Occupied")
+	check_for_inner_units_or_whole_unit(service_unit, "Occupied")
+	
+def check_for_inner_units_or_whole_unit(service_unit, status):#pivot
+	service_unit_obj = frappe.get_doc("Healthcare Service Unit", service_unit)
+	if service_unit_obj.whole_room:
+		inner_units = frappe.get_list("Healthcare Service Unit", filters={
+			"whole_room": 0,
+			"parent_healthcare_service_unit": service_unit_obj.parent_healthcare_service_unit
+		}, pluck="name")
+		for inner_unit in inner_units:
+			frappe.db.set_value("Healthcare Service Unit", inner_unit, "occupancy_status", status)
+	else:
+		whole_unit = frappe.db.get_value("Healthcare Service Unit", {
+			"whole_room": 1,
+			"parent_healthcare_service_unit": service_unit_obj.parent_healthcare_service_unit
+		}, "name")
+		if whole_unit:
+			if status == "Vacant":
+				#checking if there is another service unit Occupied for the same parent
+				#we can not make the parent Vacant if there is an inner unit Occupied
+				occupied_rooms = frappe.get_list("Healthcare Service Unit", filters = {
+					"whole_room": 0,
+					"parent_healthcare_service_unit": service_unit_obj.parent_healthcare_service_unit,
+					"occupancy_status": "Occupied",
+					"name": ["!=", service_unit]
+					}, pluck="name")
+				
+				if len(occupied_rooms) == 0:
+					frappe.db.set_value("Healthcare Service Unit", whole_unit, "occupancy_status", status)
+			else:
+				frappe.db.set_value("Healthcare Service Unit", whole_unit, "occupancy_status", status)
+
+		
 
 
 def patient_leave_service_unit(inpatient_record, check_out, leave_from):
@@ -262,6 +296,7 @@ def patient_leave_service_unit(inpatient_record, check_out, leave_from):
 				inpatient_occupancy.left = True
 				inpatient_occupancy.check_out = check_out
 				frappe.db.set_value("Healthcare Service Unit", inpatient_occupancy.service_unit, "occupancy_status", "Vacant")
+				check_for_inner_units_or_whole_unit(inpatient_occupancy.service_unit, "Vacant")
 	inpatient_record.save(ignore_permissions = True)
 
 

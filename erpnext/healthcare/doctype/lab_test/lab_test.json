@@ -37,6 +37,7 @@
   "patient_age",
   "patient_sex",
   "inpatient_record",
+  "service_unit",
   "report_preference",
   "email",
   "mobile",
@@ -373,7 +374,7 @@
    "label": "Normal Test Result",
    "options": "Normal Test Result",
    "print_hide": 1,
-   "read_only_depends_on": "eval: doc.status ==\"Completed\""
+   "read_only_depends_on": "eval: doc.status ==\"Completed\" || doc.status ==\"Draft\" "
   },
   {
    "fieldname": "lab_test_html",
@@ -490,6 +491,7 @@
    "fieldtype": "Column Break"
   },
   {
+   "default": "\u0627\u0644\u0645\u062e\u0628\u0631",
    "fetch_from": "practitioner.department",
    "fieldname": "requesting_department",
    "fieldtype": "Link",
@@ -573,7 +575,6 @@
    "fieldtype": "Table",
    "label": "Test Templates",
    "options": "Lab Test Template Detail",
-   "read_only_depends_on": "eval:!doc.__islocal",
    "reqd": 1
   },
   {
@@ -620,11 +621,20 @@
    "label": "Sales Invoice",
    "options": "Sales Invoice",
    "read_only": 1
+  },
+  {
+   "depends_on": "inpatient_record",
+   "fetch_from": "inpatient_record.current_service_unit",
+   "fieldname": "service_unit",
+   "fieldtype": "Link",
+   "label": "Service Unit",
+   "options": "Healthcare Service Unit",
+   "read_only": 1
   }
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2022-05-30 14:27:16.119513",
+ "modified": "2022-09-25 15:04:10.167117",
  "modified_by": "Administrator",
  "module": "Healthcare",
  "name": "Lab Test",

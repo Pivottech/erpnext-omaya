@@ -732,6 +732,35 @@ def get_tax_template(doctype, txt, searchfield, start, page_len, filters):
 		taxes = _get_item_tax_template(args, taxes, for_validate=True)
 		return [(d,) for d in set(taxes)]
 
+@frappe.whitelist()
+@frappe.validate_and_sanitize_search_inputs
+def warehouse_items_query(doctype, txt, searchfield, start, page_len, filters):
+	if not filters.get("warehouse"):
+		return []
+	fields = get_fields(doctype, ["name"])
+	searchfields = frappe.get_meta(doctype).get_search_fields()
+	searchfields = " or ".join(field + " like %(txt)s" for field in searchfields)
+	items = frappe.get_all("Bin", filters={
+		"warehouse": filters.get("warehouse"),
+		"actual_qty": [">",0]
+	}, pluck="item_code")
+	return frappe.db.sql("""
+	select {fields} from `tabItem` where (name in %(items)s or is_stock_item = 0) and ({scond})
+	order by if(locate(%(_txt)s, name), locate(%(_txt)s, name), 99999)
+	limit %(start)s, %(page_len)s
+	""".format(**{
+		"fields": ", ".join(fields),
+		"scond": searchfields
+	}), {
+		"items": items,
+		"txt": "%%%s%%" % txt,
+		"_txt": txt.replace("%", ""),
+		"start": start,
+		"page_len": page_len
+	}) 
+
+
+
 
 def get_fields(doctype, fields=None):
 	if fields is None:

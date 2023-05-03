@@ -16,6 +16,7 @@
   "practitioner_account",
   "must_have_practitioner",
   "invoiced",
+  "auto_item",
   "col_break1",
   "item_name",
   "customer_item_code",
@@ -902,12 +903,19 @@
    "fieldtype": "Check",
    "label": "Must Have Practitioner",
    "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "auto_item",
+   "fieldtype": "Check",
+   "label": "Auto Item",
+   "read_only": 1
   }
  ],
  "idx": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-03-02 13:21:36.793479",
+ "modified": "2022-07-31 13:14:58.329039",
  "modified_by": "Administrator",
  "module": "Accounts",
  "name": "Sales Invoice Item",

@@ -71,10 +71,10 @@
   {
    "fieldname": "naming_series",
    "fieldtype": "Select",
-   "hidden": 1,
    "label": "Series",
    "no_copy": 1,
    "options": "HLC-ENC-.YYYY.-",
+   "reqd": 1,
    "set_only_once": 1
   },
   {
@@ -382,6 +382,7 @@
    "search_index": 1
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "dossier_type",
    "fieldtype": "Select",
    "in_list_view": 1,
@@ -405,7 +406,7 @@
    "link_fieldname": "patient_encounter"
   }
  ],
- "modified": "2022-07-05 16:47:28.609487",
+ "modified": "2023-03-06 12:23:14.870525",
  "modified_by": "Administrator",
  "module": "Healthcare",
  "name": "Patient Encounter",

@@ -26,6 +26,7 @@
   "custodian",
   "department",
   "disposal_date",
+  "asset_description",
   "accounting_dimensions_section",
   "cost_center",
   "dimension_col_break",
@@ -480,6 +481,11 @@
    "fieldname": "section_break_36",
    "fieldtype": "Section Break",
    "label": "Finance Books"
+  },
+  {
+   "fieldname": "asset_description",
+   "fieldtype": "Small Text",
+   "label": "Asset Description"
   }
  ],
  "idx": 72,
@@ -502,7 +508,7 @@
    "link_fieldname": "asset"
   }
  ],
- "modified": "2021-01-22 12:38:59.091510",
+ "modified": "2022-08-08 12:41:40.983297",
  "modified_by": "Administrator",
  "module": "Assets",
  "name": "Asset",

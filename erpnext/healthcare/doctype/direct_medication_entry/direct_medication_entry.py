@@ -26,9 +26,21 @@ class DirectMedicationEntry(Document):
 		success_msg = ""
 		if self.update_stock:
 			stock_entry = self.process_stock()
-			success_msg += _('Stock Entry {0} created and ').format(
-				frappe.bold(get_link_to_form('Stock Entry', stock_entry)))
-		frappe.msgprint(success_msg, title=_('Success'), indicator='green')
+			if stock_entry:
+				success_msg += _('Stock Entry {0} created and ').format(
+					frappe.bold(get_link_to_form('Stock Entry', stock_entry)))
+				self.db_set("stock_entry", stock_entry)
+		if success_msg:
+			frappe.msgprint(success_msg, title=_('Success'), indicator='green')
+	
+	def before_cancel(self):
+		if self.stock_entry:
+			self.cancel_stock_entry()
+	
+	def cancel_stock_entry(self):
+		se = frappe.get_doc("Stock Entry", self.stock_entry)
+		self.db_set("stock_entry", None)
+		se.cancel()
 
 	def process_stock(self):
 		allow_negative_stock = frappe.db.get_single_value('Stock Settings', 'allow_negative_stock')
@@ -72,25 +84,29 @@ class DirectMedicationEntry(Document):
 		stock_entry.from_warehouse = self.warehouse
 		stock_entry.company = self.company
 		stock_entry.direct_medication_entry = self.name
+		stock_entry.patient = self.patient
 		cost_center = frappe.get_cached_value('Company',  self.company,  'cost_center')
 		expense_account = frappe.db.get_value("Warehouse", self.warehouse, "expense_account")
 
 		for entry in self.items:
-			se_child = stock_entry.append('items')
-			se_child.item_code = entry.item_code
-			se_child.item_name = entry.item_name
-			se_child.uom = frappe.db.get_value('Item', entry.item_code, 'stock_uom')
-			se_child.stock_uom = se_child.uom
-			se_child.qty = flt(entry.qty)
-			# in stock uom
-			se_child.conversion_factor = 1
-			se_child.cost_center = cost_center
-			# references
-			se_child.patient = entry.patient
-			se_child.expense_account = expense_account
-
-		stock_entry.submit()
-		return stock_entry.name
+			if frappe.db.get_value("Item", entry.item_code, "is_stock_item"):
+				se_child = stock_entry.append('items')
+				se_child.item_code = entry.item_code
+				se_child.item_name = entry.item_name
+				se_child.uom = frappe.db.get_value('Item', entry.item_code, 'stock_uom')
+				se_child.stock_uom = se_child.uom
+				se_child.qty = flt(entry.qty)
+				# in stock uom
+				se_child.conversion_factor = 1
+				se_child.cost_center = cost_center
+				# references
+				se_child.patient = entry.patient
+				se_child.expense_account = expense_account
+		if stock_entry.get("items"):
+			stock_entry.insert()
+			stock_entry.submit()
+			return stock_entry.name
+		return None
 
 	def check_invoiced(self):
 		self.invoiced = True
@@ -103,7 +119,7 @@ class DirectMedicationEntry(Document):
 	@frappe.whitelist()
 	def item_code_query(self):
 		res = frappe.get_all("Bin", filters = {"warehouse": self.warehouse}, pluck = "item_code")
-		res += frappe.get_all("Item", filters = {"is_stock_item": 1}, pluck = "name")
+		res += frappe.get_all("Item", filters = {"is_stock_item": 0}, pluck = "name")
 
 	def delete_zero_items(self):
 		items = []
@@ -118,9 +134,10 @@ def get_drug_shortage_map(medication_orders, warehouse):
 	"""
 	drug_requirement = dict()
 	for d in medication_orders:
-		if not drug_requirement.get(d.item_code):
-			drug_requirement[d.item_code] = 0
-		drug_requirement[d.item_code] += flt(d.qty)
+		if frappe.db.get_value("Item", d.item_code, "is_stock_item"):
+			if not drug_requirement.get(d.item_code):
+				drug_requirement[d.item_code] = 0
+			drug_requirement[d.item_code] += flt(d.qty)
 
 	drug_shortage = dict()
 	for drug, required_qty in drug_requirement.items():
